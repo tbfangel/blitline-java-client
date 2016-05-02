@@ -34,6 +34,7 @@ public class BlitlineImageJob implements Serializable {
     private final Boolean extendedMetadata;
     private final String postbackUrl;
     private final Map<String, String> postbackHeaders;
+    private final Integer waitRetryDelay;
     private final List<Function> functions = new LinkedList<Function>();
 
     public BlitlineImageJob(String applicationId, Object src, Boolean extendedMetadata, String postbackUrl) {
@@ -42,18 +43,25 @@ public class BlitlineImageJob implements Serializable {
 
     public BlitlineImageJob(String applicationId, Object src, Boolean extendedMetadata, String postbackUrl,
         Map<String, String> postbackHeaders) {
+        this(applicationId, src, extendedMetadata, postbackUrl, postbackHeaders, null);
+    }
+
+    public BlitlineImageJob(String applicationId,
+                            Object src,
+                            Boolean extendedMetadata,
+                            String postbackUrl,
+                            Map<String, String> postbackHeaders,
+                            Integer waitRetryDelay) {
         Validate.notNull(applicationId, "application ID must not be null");
         this.applicationId = applicationId;
-
         Validate.notNull(src, "image source must not be null");
         this.src = src;
-
         this.extendedMetadata = extendedMetadata;
-
         this.postbackUrl = postbackUrl;
-
         this.postbackHeaders = postbackHeaders == null ? null : Collections.unmodifiableMap(new HashMap<String, String>(
-            postbackHeaders));
+                postbackHeaders));
+        if (waitRetryDelay != null) Validate.inclusiveBetween(0, Integer.MAX_VALUE, waitRetryDelay);
+        this.waitRetryDelay = waitRetryDelay;
     }
 
     public String getApplicationId() {
@@ -74,6 +82,15 @@ public class BlitlineImageJob implements Serializable {
 
     public Map<String, String> getPostbackHeaders() {
         return postbackHeaders;
+    }
+
+    /**
+     * Retrieve the value (in seconds) for wait_retry_delay which determines how long time Blitline will wait before it retries a failed job.
+     * If not set, then Blitline will not retry a failed job.
+     * @return
+     */
+    public Integer getWaitRetryDelay() {
+        return waitRetryDelay;
     }
 
     /**
@@ -123,6 +140,8 @@ public class BlitlineImageJob implements Serializable {
         private String postbackUrl;
 
         private Map<String, String> postbackHeaders = new HashMap<String, String>();
+
+        private Integer waitRetryDelay;
 
         /**
          * Constructs a {@code Builder} instance for a single {@code Job}.
@@ -250,6 +269,16 @@ public class BlitlineImageJob implements Serializable {
         }
 
         /**
+         * Specifies that Blitline should retry a failed job after this amount of second.
+         * @param waitRetryDelay
+         * @return
+         */
+        public Builder withWaitRetryDelay(Integer waitRetryDelay) {
+            this.waitRetryDelay = waitRetryDelay;
+            return this;
+        }
+
+        /**
          * Build the job and apply one or more functions.
          *
          * @param functions
@@ -258,7 +287,7 @@ public class BlitlineImageJob implements Serializable {
          */
         public BlitlineImageJob apply(Function... functions) {
             Map<String, String> postbackHeaders = this.postbackHeaders.isEmpty() ? null : this.postbackHeaders;
-            BlitlineImageJob job = new BlitlineImageJob(applicationId, src, extendedMetadata, postbackUrl, postbackHeaders);
+            BlitlineImageJob job = new BlitlineImageJob(applicationId, src, extendedMetadata, postbackUrl, postbackHeaders, waitRetryDelay);
             job.apply(functions);
             return job;
         }

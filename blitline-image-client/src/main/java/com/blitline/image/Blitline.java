@@ -56,7 +56,7 @@ public class Blitline {
 	/**
 	 * The API version this library will invoke. 1.21 added the ability to append arbitrary EXIF to saved images.
 	 */
-	public static final String BLITLINE_API_VERSION = "1.21";
+	public static final String BLITLINE_API_VERSION = "1.22";
 
 	private Blitline() {
 	}
