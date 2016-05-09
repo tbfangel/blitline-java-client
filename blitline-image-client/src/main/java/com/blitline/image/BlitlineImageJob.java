@@ -54,12 +54,17 @@ public class BlitlineImageJob implements Serializable {
                             Integer waitRetryDelay) {
         Validate.notNull(applicationId, "application ID must not be null");
         this.applicationId = applicationId;
+
         Validate.notNull(src, "image source must not be null");
         this.src = src;
+
         this.extendedMetadata = extendedMetadata;
+
         this.postbackUrl = postbackUrl;
+
         this.postbackHeaders = postbackHeaders == null ? null : Collections.unmodifiableMap(new HashMap<String, String>(
                 postbackHeaders));
+
         if (waitRetryDelay != null) Validate.inclusiveBetween(0, Integer.MAX_VALUE, waitRetryDelay);
         this.waitRetryDelay = waitRetryDelay;
     }
@@ -87,7 +92,8 @@ public class BlitlineImageJob implements Serializable {
     /**
      * Retrieve the value (in seconds) for wait_retry_delay which determines how long time Blitline will wait before it retries a failed job.
      * If not set, then Blitline will not retry a failed job.
-     * @return
+     * 
+     * @return The value (in seconds) for wait_retry_delay
      */
     public Integer getWaitRetryDelay() {
         return waitRetryDelay;
@@ -98,7 +104,7 @@ public class BlitlineImageJob implements Serializable {
      * not set.
      *
      * @param name the name of the HTTP header
-     * @return
+     * @return The value for the specified header (or null if the header is not set)
      */
     public String getPostbackHeader(String name) {
         if (postbackHeaders == null) {
@@ -270,8 +276,9 @@ public class BlitlineImageJob implements Serializable {
 
         /**
          * Specifies that Blitline should retry a failed job after this amount of second.
-         * @param waitRetryDelay
-         * @return
+         *
+         * @param waitRetryDelay The wait retry delay in seconds
+         * @return this {@code Builder} object
          */
         public Builder withWaitRetryDelay(Integer waitRetryDelay) {
             this.waitRetryDelay = waitRetryDelay;
